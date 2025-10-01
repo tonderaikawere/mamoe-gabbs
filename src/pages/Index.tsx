@@ -379,7 +379,78 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Section 7: Call to Action */}
+        {/* Section 7: Meet Our Team */}
+        <section className="py-20 container mx-auto px-4">
+          <div className="text-center mb-16 animate-fade-in">
+            <h2 className="font-serif text-4xl md:text-5xl font-bold text-foreground mb-4">
+              Meet Our Expert Team
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Dedicated professionals committed to your natural wellness journey
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <Card className="bg-gradient-card shadow-soft hover:shadow-hover transition-all duration-300 animate-fade-in">
+              <CardContent className="p-6 text-center">
+                <div className="w-24 h-24 rounded-full bg-primary/10 mx-auto mb-4 flex items-center justify-center">
+                  <Users className="h-12 w-12 text-primary" />
+                </div>
+                <h3 className="font-serif text-xl font-bold text-card-foreground mb-2">
+                  Lee Gabhadiya
+                </h3>
+                <p className="text-primary font-medium mb-3">Founder & Chief Herbalist</p>
+                <p className="text-sm text-muted-foreground">
+                  With over 15 years of experience in traditional African herbal medicine, Lee founded Mamoe Gabhadiya to share ancestral healing wisdom with modern communities.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-card shadow-soft hover:shadow-hover transition-all duration-300 animate-fade-in" style={{ animationDelay: '0.1s' }}>
+              <CardContent className="p-6 text-center">
+                <div className="w-24 h-24 rounded-full bg-primary/10 mx-auto mb-4 flex items-center justify-center">
+                  <Heart className="h-12 w-12 text-primary" />
+                </div>
+                <h3 className="font-serif text-xl font-bold text-card-foreground mb-2">
+                  Dr. Sarah Moyo
+                </h3>
+                <p className="text-primary font-medium mb-3">Head of Product Development</p>
+                <p className="text-sm text-muted-foreground">
+                  A qualified botanist and herbalist, Dr. Moyo ensures all our products meet the highest quality standards while preserving traditional healing properties.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-card shadow-soft hover:shadow-hover transition-all duration-300 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+              <CardContent className="p-6 text-center">
+                <div className="w-24 h-24 rounded-full bg-primary/10 mx-auto mb-4 flex items-center justify-center">
+                  <TrendingUp className="h-12 w-12 text-primary" />
+                </div>
+                <h3 className="font-serif text-xl font-bold text-card-foreground mb-2">
+                  Marcus Ndlovu
+                </h3>
+                <p className="text-primary font-medium mb-3">Customer Relations Manager</p>
+                <p className="text-sm text-muted-foreground">
+                  Marcus leads our customer support team, ensuring every client receives personalized guidance on their wellness journey with our herbal solutions.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="text-center mt-12">
+            <Button
+              asChild
+              size="lg"
+              className="bg-primary hover:bg-primary/90 shadow-hover"
+            >
+              <Link to="/team" onClick={scrollToTopImmediate}>
+                Meet the Full Team <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            </Button>
+          </div>
+        </section>
+
+        {/* Section 8: Call to Action */}
         <section className="py-20 bg-gradient-hero text-primary-foreground">
           <div className="container mx-auto px-4 text-center animate-fade-in">
             <h2 className="font-serif text-4xl md:text-5xl font-bold mb-6">

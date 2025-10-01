@@ -148,6 +148,104 @@ const About = () => {
           </div>
         </section>
 
+        {/* Partners Section */}
+        <section className="py-20 container mx-auto px-4">
+          <div className="text-center mb-16 animate-fade-in">
+            <h2 className="font-serif text-4xl font-bold text-foreground mb-4">
+              Our Trusted Partners
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              We collaborate with leading organizations to bring you the finest herbal solutions
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <Card className="bg-gradient-card shadow-soft hover:shadow-hover transition-all duration-300 animate-fade-in">
+              <CardContent className="p-6 text-center">
+                <div className="w-16 h-16 rounded-full bg-primary/10 mx-auto mb-4 flex items-center justify-center">
+                  <Globe className="h-8 w-8 text-primary" />
+                </div>
+                <h3 className="font-serif text-xl font-bold text-card-foreground mb-2">
+                  African Botanical Society
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Research partnership for sustainable herb cultivation and traditional knowledge preservation across Africa.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-card shadow-soft hover:shadow-hover transition-all duration-300 animate-fade-in" style={{ animationDelay: '0.1s' }}>
+              <CardContent className="p-6 text-center">
+                <div className="w-16 h-16 rounded-full bg-primary/10 mx-auto mb-4 flex items-center justify-center">
+                  <Users className="h-8 w-8 text-primary" />
+                </div>
+                <h3 className="font-serif text-xl font-bold text-card-foreground mb-2">
+                  Community Health Networks
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Collaboration with local health practitioners to provide integrated wellness solutions in rural communities.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-card shadow-soft hover:shadow-hover transition-all duration-300 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+              <CardContent className="p-6 text-center">
+                <div className="w-16 h-16 rounded-full bg-primary/10 mx-auto mb-4 flex items-center justify-center">
+                  <CheckCircle className="h-8 w-8 text-primary" />
+                </div>
+                <h3 className="font-serif text-xl font-bold text-card-foreground mb-2">
+                  Quality Assurance Labs
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Partnership with certified laboratories to ensure product safety, purity, and potency testing.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-card shadow-soft hover:shadow-hover transition-all duration-300 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+              <CardContent className="p-6 text-center">
+                <div className="w-16 h-16 rounded-full bg-primary/10 mx-auto mb-4 flex items-center justify-center">
+                  <Heart className="h-8 w-8 text-primary" />
+                </div>
+                <h3 className="font-serif text-xl font-bold text-card-foreground mb-2">
+                  Traditional Healers Council
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Working with respected traditional healers to maintain authentic preparation methods and cultural integrity.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-card shadow-soft hover:shadow-hover transition-all duration-300 animate-fade-in" style={{ animationDelay: '0.4s' }}>
+              <CardContent className="p-6 text-center">
+                <div className="w-16 h-16 rounded-full bg-primary/10 mx-auto mb-4 flex items-center justify-center">
+                  <Target className="h-8 w-8 text-primary" />
+                </div>
+                <h3 className="font-serif text-xl font-bold text-card-foreground mb-2">
+                  Sustainable Farming Co-ops
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Direct partnerships with organic farming cooperatives to ensure ethical sourcing and fair trade practices.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-card shadow-soft hover:shadow-hover transition-all duration-300 animate-fade-in" style={{ animationDelay: '0.5s' }}>
+              <CardContent className="p-6 text-center">
+                <div className="w-16 h-16 rounded-full bg-primary/10 mx-auto mb-4 flex items-center justify-center">
+                  <Eye className="h-8 w-8 text-primary" />
+                </div>
+                <h3 className="font-serif text-xl font-bold text-card-foreground mb-2">
+                  Research Universities
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Collaborative research with leading universities to study herbal efficacy and develop new applications.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
         <section className="py-20 bg-primary text-primary-foreground">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto animate-fade-in">

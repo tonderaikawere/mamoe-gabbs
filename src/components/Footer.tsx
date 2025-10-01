@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Leaf, MapPin, Mail, Phone } from "lucide-react";
+import { Leaf, MapPin, Mail, Phone, Facebook, Twitter, Instagram, Youtube } from "lucide-react";
 import { scrollToTopImmediate } from "@/hooks/use-scroll-to-top";
 
 const Footer = () => {
@@ -18,6 +18,20 @@ const Footer = () => {
               Natural herbal solutions for health, wealth, and wellbeing across Africa.
               Founded in 2020.
             </p>
+            <div className="flex space-x-4">
+              <a href="https://facebook.com/mamoegabhadiya" target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors">
+                <Facebook className="h-5 w-5" />
+              </a>
+              <a href="https://instagram.com/mamoegabhadiya" target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors">
+                <Instagram className="h-5 w-5" />
+              </a>
+              <a href="https://twitter.com/mamoegabhadiya" target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors">
+                <Twitter className="h-5 w-5" />
+              </a>
+              <a href="https://youtube.com/@mamoegabhadiya" target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors">
+                <Youtube className="h-5 w-5" />
+              </a>
+            </div>
           </div>
 
           <div>
@@ -130,6 +144,9 @@ const Footer = () => {
               Terms of Service
             </Link>
           </div>
+          <p className="mt-4 text-primary-foreground/70 text-xs">
+            Website developed by <a href="https://kawerifytech.com" target="_blank" rel="noopener noreferrer" className="font-semibold hover:text-accent transition-colors">Kawerify Tech</a>
+          </p>
         </div>
       </div>
     </footer>
