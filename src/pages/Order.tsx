@@ -1,48 +1,75 @@
 import { useState } from "react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 import { useScrollToTopOnMount } from "@/hooks/use-scroll-to-top";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ShoppingCart, Plus, Minus, Send } from "lucide-react";
+import { ShoppingCart, Plus, Minus, Send, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 
-// Import product images
-import immuneBoosterImg from "@/assets/products/immune-booster.jpg";
-import energyVitalityImg from "@/assets/products/energy-vitality.jpg";
-import digestiveHealthImg from "@/assets/products/digestive-health.jpg";
-import sleepRelaxationImg from "@/assets/products/sleep-relaxation.jpg";
-import bloodPressureImg from "@/assets/products/blood-pressure.jpg";
-import prosperityBlendImg from "@/assets/products/prosperity-blend.jpg";
-import protectionHerbsImg from "@/assets/products/protection-herbs.jpg";
-import beautySkincareImg from "@/assets/products/beauty-skincare.jpg";
-import hairGrowthImg from "@/assets/products/hair-growth.jpg";
-import detoxBlendImg from "@/assets/products/detox-blend.jpg";
-import traditionalHealingImg from "@/assets/products/traditional-healing.jpg";
+// Product images from public directory
+const productImages = {
+  immune: "/images/IMG_7214.webp",
+  energy: "/images/IMG_7215.webp",
+  digestive: "/images/IMG_7216.webp",
+  sleep: "/images/IMG_7218.webp",
+  bloodPressure: "/images/IMG_7219.webp",
+  prosperity: "/images/IMG_7220.webp",
+  protection: "/images/IMG_7221.webp",
+  beauty: "/images/IMG_7222.webp",
+  hairGrowth: "/images/IMG_7223.webp",
+  detox: "/images/IMG_7225.webp",
+  traditional: "/images/IMG_7227.webp"
+};
 
-// Product data with images and numeric prices
+// Complete product data with all products from the main catalog
 const orderProducts = [
-  { id: 1, name: "Immune Booster Blend", price: 250, priceDisplay: "R 250", category: "Health & Wellness", image: immuneBoosterImg },
-  { id: 2, name: "Energy & Vitality Mix", price: 280, priceDisplay: "R 280", category: "Health & Wellness", image: energyVitalityImg },
-  { id: 3, name: "Digestive Health Herbs", price: 220, priceDisplay: "R 220", category: "Health & Wellness", image: digestiveHealthImg },
-  { id: 4, name: "Sleep & Relaxation Tea", price: 240, priceDisplay: "R 240", category: "Health & Wellness", image: sleepRelaxationImg },
-  { id: 5, name: "Blood Pressure Balance", price: 290, priceDisplay: "R 290", category: "Health & Wellness", image: bloodPressureImg },
-  { id: 6, name: "Prosperity Blend", price: 360, priceDisplay: "R 360", category: "Wealth & Prosperity", image: prosperityBlendImg },
-  { id: 7, name: "Good Luck Herbs", price: 330, priceDisplay: "R 330", category: "Wealth & Prosperity", image: protectionHerbsImg },
-  { id: 8, name: "Career Advancement Mix", price: 370, priceDisplay: "R 370", category: "Wealth & Prosperity", image: prosperityBlendImg },
-  { id: 9, name: "Beauty & Skin Care", price: 295, priceDisplay: "R 295", category: "Lifestyle Enhancement", image: beautySkincareImg },
-  { id: 10, name: "Hair Growth Formula", price: 310, priceDisplay: "R 310", category: "Lifestyle Enhancement", image: hairGrowthImg },
-  { id: 11, name: "Natural Detox Blend", price: 280, priceDisplay: "R 280", category: "Lifestyle Enhancement", image: detoxBlendImg },
-  { id: 12, name: "Traditional Healing Blend", price: 330, priceDisplay: "R 330", category: "Traditional Remedies", image: traditionalHealingImg },
+  // Health & Wellness
+  { id: 1, name: "Immune Booster Blend", price: 250, priceDisplay: "R 250", category: "Health & Wellness", image: productImages.immune, description: "Powerful blend to strengthen your natural defenses. Contains echinacea and elderberry." },
+  { id: 2, name: "Energy & Vitality Mix", price: 280, priceDisplay: "R 280", category: "Health & Wellness", image: productImages.energy, description: "Natural energy boost without caffeine jitters. Includes ginseng and rhodiola." },
+  { id: 3, name: "Digestive Health Herbs", price: 220, priceDisplay: "R 220", category: "Health & Wellness", image: productImages.digestive, description: "Soothe your stomach naturally. Ginger, peppermint, and fennel blend." },
+  { id: 4, name: "Sleep & Relaxation Tea", price: 240, priceDisplay: "R 240", category: "Health & Wellness", image: productImages.sleep, description: "Drift into peaceful sleep. Chamomile, lavender, and valerian root." },
+  { id: 5, name: "Blood Pressure Balance", price: 290, priceDisplay: "R 290", category: "Health & Wellness", image: productImages.bloodPressure, description: "Support cardiovascular health naturally. Hawthorn and hibiscus." },
+  { id: 6, name: "Diabetes Support Blend", price: 310, priceDisplay: "R 310", category: "Health & Wellness", image: productImages.immune, description: "Help manage blood sugar levels naturally. Bitter melon and fenugreek." },
+  { id: 7, name: "Heart Health Formula", price: 300, priceDisplay: "R 300", category: "Health & Wellness", image: productImages.bloodPressure, description: "Keep your heart strong and healthy. Garlic and omega-rich herbs." },
+  { id: 8, name: "Joint & Bone Strength", price: 320, priceDisplay: "R 320", category: "Health & Wellness", image: productImages.digestive, description: "Reduce inflammation and improve mobility. Turmeric and boswellia." },
+  { id: 9, name: "Respiratory Relief Mix", price: 260, priceDisplay: "R 260", category: "Health & Wellness", image: productImages.energy, description: "Breathe easier naturally. Eucalyptus, thyme, and mullein." },
+  { id: 10, name: "Anti-Inflammatory Blend", price: 275, priceDisplay: "R 275", category: "Health & Wellness", image: productImages.immune, description: "Natural inflammation fighter. Ginger, turmeric, and black pepper." },
+  { id: 11, name: "Memory & Focus Herbs", price: 295, priceDisplay: "R 295", category: "Health & Wellness", image: productImages.energy, description: "Enhance mental clarity and concentration. Ginkgo and bacopa." },
+  { id: 12, name: "Liver Detox Formula", price: 285, priceDisplay: "R 285", category: "Health & Wellness", image: productImages.detox, description: "Support your liver's natural cleansing. Milk thistle and dandelion." },
+  
+  // Wealth & Prosperity
+  { id: 13, name: "Prosperity Blend", price: 350, priceDisplay: "R 350", category: "Wealth & Prosperity", image: productImages.prosperity, description: "Attract abundance and financial blessings. Traditional wealth herbs." },
+  { id: 14, name: "Success & Abundance Mix", price: 380, priceDisplay: "R 380", category: "Wealth & Prosperity", image: productImages.prosperity, description: "Open doors to new opportunities. Prosperity-drawing botanicals." },
+  { id: 15, name: "Protection Herbs", price: 320, priceDisplay: "R 320", category: "Wealth & Prosperity", image: productImages.protection, description: "Shield against negative energy. Sage and protective plants." },
+  { id: 16, name: "Good Luck Herbs", price: 330, priceDisplay: "R 330", category: "Wealth & Prosperity", image: productImages.protection, description: "Enhance fortune in all areas of life. Lucky botanicals." },
+  { id: 17, name: "Career Advancement Mix", price: 370, priceDisplay: "R 370", category: "Wealth & Prosperity", image: productImages.prosperity, description: "Rise to the top naturally. Professional success herbs." },
+  { id: 18, name: "Money Drawing Blend", price: 360, priceDisplay: "R 360", category: "Wealth & Prosperity", image: productImages.prosperity, description: "Ancient recipe for financial attraction. Time-tested formula." },
+  
+  // Lifestyle Enhancement
+  { id: 19, name: "Beauty & Skin Care", price: 295, priceDisplay: "R 295", category: "Lifestyle Enhancement", image: productImages.beauty, description: "Radiant skin from within. Rose, hibiscus, and collagen-boosting herbs." },
+  { id: 20, name: "Hair Growth Formula", price: 310, priceDisplay: "R 310", category: "Lifestyle Enhancement", image: productImages.hairGrowth, description: "Strengthen and grow luscious hair. Rosemary, nettle, and horsetail." },
+  { id: 21, name: "Natural Detox Blend", price: 280, priceDisplay: "R 280", category: "Lifestyle Enhancement", image: productImages.detox, description: "Full body cleanse and renewal. Gentle yet effective detox herbs." },
+  { id: 22, name: "Stress Relief Mix", price: 265, priceDisplay: "R 265", category: "Lifestyle Enhancement", image: "/images/IMG_7226.webp", description: "Find your calm naturally. Adaptogenic stress-busting herbs." },
+  { id: 23, name: "Weight Management Tea", price: 290, priceDisplay: "R 290", category: "Lifestyle Enhancement", image: productImages.detox, description: "Support healthy metabolism naturally. Green tea and garcinia." },
+  { id: 24, name: "Anti-Aging Blend", price: 325, priceDisplay: "R 325", category: "Lifestyle Enhancement", image: productImages.beauty, description: "Turn back the clock naturally. Antioxidant-rich youth herbs." },
+  
+  // Traditional Remedies
+  { id: 25, name: "Traditional Healing Blend", price: 330, priceDisplay: "R 330", category: "Traditional Remedies", image: productImages.traditional, description: "Ancient African healing wisdom. Multi-purpose wellness herbs." },
+  { id: 26, name: "Ancestral Wisdom Mix", price: 350, priceDisplay: "R 350", category: "Traditional Remedies", image: productImages.traditional, description: "Connect with ancestral knowledge. Sacred traditional herbs." },
+  { id: 27, name: "Cultural Heritage Herbs", price: 340, priceDisplay: "R 340", category: "Traditional Remedies", image: productImages.traditional, description: "Preserve cultural healing traditions. Authentic African botanicals." },
+  { id: 28, name: "Spiritual Cleansing", price: 320, priceDisplay: "R 320", category: "Traditional Remedies", image: productImages.protection, description: "Purify your spirit and space. Sacred cleansing herbs." },
 ];
 
 const Order = () => {
   useScrollToTopOnMount();
 
   const [selectedProducts, setSelectedProducts] = useState<{[key: number]: number}>({});
+  const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [customerInfo, setCustomerInfo] = useState({
     name: "",
     email: "",
@@ -90,54 +117,91 @@ const Order = () => {
       return;
     }
 
-    if (!customerInfo.name || !customerInfo.email || !customerInfo.phone) {
-      toast.error("Please fill in all required fields");
+    if (!customerInfo.name || !customerInfo.phone) {
+      toast.error("Please fill in your name and phone number");
       return;
     }
 
     // Create order summary
     const orderSummary = selectedList.map(product => 
-      `${product.name} - Quantity: ${selectedProducts[product.id]} - Unit Price: ${product.priceDisplay} - Subtotal: R ${product.price * selectedProducts[product.id]}`
+      `• ${product.name} - Qty: ${selectedProducts[product.id]} - ${product.priceDisplay} each - Subtotal: R ${product.price * selectedProducts[product.id]}`
     ).join('\n');
 
-    const emailBody = `
-New Order from Mamoe Gabhadiya Website
+    const whatsappMessage = `🌿 *NEW ORDER - Mamoe Gabhadiya*\n\n👤 *Customer Information:*\nName: ${customerInfo.name}\nEmail: ${customerInfo.email || 'Not provided'}\nPhone: ${customerInfo.phone}\nAddress: ${customerInfo.address}\nCity: ${customerInfo.city}\nCountry: ${customerInfo.country}\n\n🛒 *Order Details:*\n${orderSummary}\n\n📊 *Order Summary:*\nTotal Items: ${getTotalItems()}\n💰 *TOTAL COST: R ${getTotalCost()}*\n\n📝 *Additional Notes:*\n${customerInfo.notes || 'None'}\n\nPlease confirm this order and let me know about payment and delivery options. Thank you! 🙏`;
 
-Customer Information:
-Name: ${customerInfo.name}
-Email: ${customerInfo.email}
-Phone: ${customerInfo.phone}
-Address: ${customerInfo.address}
-City: ${customerInfo.city}
-Country: ${customerInfo.country}
-
-Order Details:
-${orderSummary}
-
-Total Items: ${getTotalItems()}
-TOTAL COST: R ${getTotalCost()}
-
-Additional Notes:
-${customerInfo.notes}
-
-Please contact the customer to confirm the order and arrange payment and delivery.
-    `;
-
-    const mailtoLink = `mailto:kawerifytech@gmail.com?subject=New Order - ${customerInfo.name}&body=${encodeURIComponent(emailBody)}`;
+    // SA WhatsApp number
+    const whatsappNumber = "+27814687186";
+    const whatsappUrl = `https://wa.me/${whatsappNumber.replace('+', '')}?text=${encodeURIComponent(whatsappMessage)}`;
     
-    window.location.href = mailtoLink;
+    window.open(whatsappUrl, '_blank');
     
-    toast.success("Order email opened! Please send the email to complete your order.");
+    toast.success("Redirecting to WhatsApp to send your order!");
+    
+    // Reset form after successful submission
+    setSelectedProducts({});
+    setCustomerInfo({
+      name: "",
+      email: "",
+      phone: "",
+      address: "",
+      city: "",
+      country: "",
+      notes: ""
+    });
   };
 
   const categories = [...new Set(orderProducts.map(p => p.category))];
+  const allCategories = ["All", ...categories];
+  
+  const filteredProducts = selectedCategory === "All" 
+    ? orderProducts 
+    : orderProducts.filter(p => p.category === selectedCategory);
+
+  const orderPageSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Order African Herbal Products Online",
+    "description": "Order premium African herbal products online with WhatsApp delivery. Fast, secure ordering process with expert consultation.",
+    "mainEntity": {
+      "@type": "Store",
+      "name": "Mamoe Gabhadiya Herbal Store",
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Herbal Products for Order",
+        "itemListElement": orderProducts.slice(0, 10).map((product, index) => ({
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Product",
+            "name": product.name,
+            "description": product.description,
+            "category": product.category,
+            "image": `https://mamoegabhadiya.com${product.image}`
+          },
+          "price": product.price.toString(),
+          "priceCurrency": "ZAR",
+          "availability": "https://schema.org/InStock",
+          "position": index + 1
+        }))
+      },
+      "paymentAccepted": "WhatsApp Order",
+      "currenciesAccepted": "ZAR",
+      "openingHours": "Mo-Su 08:00-20:00"
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-earth">
+      <SEO 
+        title="Order Premium African Herbal Products Online | WhatsApp Delivery | Mamoe Gabhadiya"
+        description="Order authentic African herbal products online. 28+ natural herbs for health, wealth, beauty & healing. Fast WhatsApp delivery across South Africa & Zimbabwe. Expert consultation included. Order now!"
+        keywords="order african herbs online, buy herbal products whatsapp, herbal products delivery south africa, zimbabwe herbal delivery, order natural herbs online, whatsapp herbal ordering, african traditional medicine order, herbal supplements order, natural health products delivery, mamoe gabhadiya order, herbal consultation order, traditional healing herbs order, immune booster order, energy herbs order, prosperity herbs order, beauty herbs order, order herbs whatsapp delivery, secure herbal ordering, fast herb delivery"
+        url="https://mamoegabhadiya.com/order"
+        schemaData={orderPageSchema}
+      />
       <Navigation />
       
       <main className="pt-24 pb-16">
-        <div className="container mx-auto px-4 max-w-6xl">
+        <div className="container mx-auto px-4 max-w-7xl">
           <div className="text-center mb-12">
             <h1 className="font-serif text-4xl md:text-5xl font-bold text-foreground mb-4">
               Place Your Order
@@ -147,70 +211,93 @@ Please contact the customer to confirm the order and arrange payment and deliver
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             {/* Product Selection */}
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-3">
               <Card className="bg-card shadow-soft">
                 <CardContent className="p-6">
-                  <h2 className="font-serif text-2xl font-bold text-foreground mb-6">
-                    Select Products
-                  </h2>
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                    <h2 className="font-serif text-2xl font-bold text-foreground">
+                      Select Products ({orderProducts.length} available)
+                    </h2>
+                    
+                    {/* Category Filter */}
+                    <div className="flex flex-wrap gap-2">
+                      {allCategories.map(category => (
+                        <Button
+                          key={category}
+                          variant={selectedCategory === category ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setSelectedCategory(category)}
+                          className="text-xs"
+                        >
+                          {category}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
                   
-                  {categories.map(category => (
-                    <div key={category} className="mb-8">
-                      <h3 className="font-semibold text-lg text-primary mb-4">{category}</h3>
-                      <div className="space-y-3">
-                        {orderProducts.filter(p => p.category === category).map(product => (
-                          <div key={product.id} className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-muted/50 transition-colors">
-                            <div className="flex items-center space-x-4">
-                              <Checkbox
-                                checked={selectedProducts[product.id] > 0}
-                                onCheckedChange={() => handleProductToggle(product.id)}
-                              />
-                              <div className="w-16 h-16 rounded-lg overflow-hidden bg-muted flex-shrink-0">
-                                <img 
-                                  src={product.image} 
-                                  alt={product.name}
-                                  className="w-full h-full object-cover"
-                                />
+                  {/* Products Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {filteredProducts.map(product => (
+                      <Card key={product.id} className="overflow-hidden hover:shadow-md transition-shadow">
+                        <div className="relative h-48 overflow-hidden">
+                          <img 
+                            src={product.image} 
+                            alt={product.name}
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute top-2 right-2">
+                            <span className="bg-primary/90 text-primary-foreground text-xs px-2 py-1 rounded-full">
+                              {product.category}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <CardContent className="p-3 h-48">
+                          <h3 className="font-semibold text-sm text-foreground mb-2 line-clamp-1">{product.name}</h3>
+                          <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{product.description}</p>
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-lg font-bold text-primary">{product.priceDisplay}</span>
+                            <Checkbox
+                              checked={selectedProducts[product.id] > 0}
+                              onCheckedChange={() => handleProductToggle(product.id)}
+                            />
+                          </div>
+                          
+                          {selectedProducts[product.id] > 0 && (
+                            <div className="space-y-2">
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm text-muted-foreground">Quantity:</span>
+                                <div className="flex items-center space-x-2">
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => handleQuantityChange(product.id, -1)}
+                                  >
+                                    <Minus className="h-3 w-3" />
+                                  </Button>
+                                  <span className="w-8 text-center font-medium">
+                                    {selectedProducts[product.id]}
+                                  </span>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => handleQuantityChange(product.id, 1)}
+                                  >
+                                    <Plus className="h-3 w-3" />
+                                  </Button>
+                                </div>
                               </div>
-                              <div className="flex-grow">
-                                <p className="font-medium text-foreground">{product.name}</p>
-                                <p className="text-lg font-bold text-primary">{product.priceDisplay}</p>
-                                {selectedProducts[product.id] > 0 && (
-                                  <p className="text-sm text-muted-foreground">
-                                    Subtotal: R {product.price * selectedProducts[product.id]}
-                                  </p>
-                                )}
+                              <div className="text-sm font-medium text-primary">
+                                Subtotal: R {product.price * selectedProducts[product.id]}
                               </div>
                             </div>
-                            
-                            {selectedProducts[product.id] > 0 && (
-                              <div className="flex items-center space-x-2">
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => handleQuantityChange(product.id, -1)}
-                                >
-                                  <Minus className="h-3 w-3" />
-                                </Button>
-                                <span className="w-8 text-center font-medium">
-                                  {selectedProducts[product.id]}
-                                </span>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => handleQuantityChange(product.id, 1)}
-                                >
-                                  <Plus className="h-3 w-3" />
-                                </Button>
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
+                          )}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
                 </CardContent>
               </Card>
             </div>
@@ -346,15 +433,15 @@ Please contact the customer to confirm the order and arrange payment and deliver
                   
                   <Button
                     onClick={handleSubmitOrder}
-                    className="w-full mt-6 bg-primary hover:bg-primary/90"
+                    className="w-full mt-6 bg-green-600 hover:bg-green-700 text-white"
                     size="lg"
                   >
-                    <Send className="h-4 w-4 mr-2" />
-                    Send Order Email
+                    <MessageCircle className="h-4 w-4 mr-2" />
+                    Send Order via WhatsApp
                   </Button>
                   
                   <p className="text-xs text-muted-foreground mt-2 text-center">
-                    * Required fields. We'll contact you to confirm payment and delivery.
+                    * Name and phone required. Order will be sent to our SA WhatsApp for confirmation.
                   </p>
                 </CardContent>
               </Card>

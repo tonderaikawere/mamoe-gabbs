@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 import { useEffect } from "react";
 import { useScrollToTopOnMount, scrollToTopImmediate } from "@/hooks/use-scroll-to-top";
 import heroImage from "@/assets/hero-herbs.jpg";
@@ -97,8 +98,73 @@ const Index = () => {
     }
   }, []);
 
+  const homePageSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Mamoe Gabhadiya",
+    "alternateName": "Mamoe Gabhadiya Herbal Products",
+    "url": "https://mamoegabhadiya.com",
+    "description": "Premium African herbal products for natural health, wellness, beauty, and traditional healing solutions.",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://mamoegabhadiya.com/products?search={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
+    },
+    "mainEntity": {
+      "@type": "LocalBusiness",
+      "@id": "https://mamoegabhadiya.com/#business",
+      "name": "Mamoe Gabhadiya",
+      "image": "https://mamoegabhadiya.com/images/IMG_7213.webp",
+      "telephone": "+27814687186",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "ZA",
+        "addressRegion": "Gauteng"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": -26.2041,
+        "longitude": 28.0473
+      },
+      "openingHours": "Mo-Su 08:00-20:00",
+      "priceRange": "R200-R400",
+      "servesCuisine": "Herbal Products",
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "African Herbal Products",
+        "itemListElement": [
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Product",
+              "name": "Health & Wellness Herbs",
+              "description": "Natural immune boosters, energy herbs, digestive health, sleep aids"
+            }
+          },
+          {
+            "@type": "Offer", 
+            "itemOffered": {
+              "@type": "Product",
+              "name": "Wealth & Prosperity Herbs",
+              "description": "Traditional prosperity blends, success herbs, protection herbs"
+            }
+          }
+        ]
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-earth">
+      <SEO 
+        title="Mamoe Gabhadiya - Premium African Herbal Products | Natural Health & Wellness Solutions"
+        description="Discover authentic African herbal products for health, wealth, beauty & traditional healing. Premium natural herbs from South Africa & Zimbabwe. Order online with WhatsApp delivery. Immune boosters, energy blends, prosperity herbs & more."
+        keywords="african herbal products, natural herbs south africa, traditional medicine zimbabwe, herbal remedies, immune booster herbs, energy herbs, prosperity herbs, beauty herbs, natural healing, traditional african medicine, herbal supplements, organic herbs, natural health products, wellness herbs, medicinal plants, herbal tea, detox herbs, stress relief herbs, anti-inflammatory herbs, digestive herbs, sleep herbs, memory herbs, heart health herbs, blood pressure herbs, diabetes herbs, weight loss herbs, hair growth herbs, skin care herbs, anti-aging herbs, mamoe gabhadiya, herbal products online, buy herbs online, whatsapp herbal delivery"
+        schemaData={homePageSchema}
+      />
       <Navigation />
       
       <main className="pt-16">

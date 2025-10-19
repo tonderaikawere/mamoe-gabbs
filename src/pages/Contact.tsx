@@ -1,11 +1,12 @@
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 import { useScrollToTopOnMount } from "@/hooks/use-scroll-to-top";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { MapPin, Phone, Mail, Send } from "lucide-react";
+import { MapPin, Phone, Mail, Send, MessageCircle } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -40,7 +41,15 @@ const Contact = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success("Thank you for your message! We'll get back to you soon.");
+    
+    // SA WhatsApp number
+    const whatsappNumber = "+27814687186";
+    const message = `Hello Mamoe Gabhadiya!\n\nName: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.phone}\nLocation: ${formData.location}\n\nMessage: ${formData.message}`;
+    
+    const whatsappUrl = `https://wa.me/${whatsappNumber.replace('+', '')}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+    
+    toast.success("Redirecting to WhatsApp to send your message!");
     setFormData({ name: "", email: "", phone: "", location: "", message: "" });
   };
 
@@ -50,8 +59,45 @@ const Contact = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const contactPageSchema = {
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    "mainEntity": {
+      "@type": "LocalBusiness",
+      "name": "Mamoe Gabhadiya",
+      "image": "https://mamoegabhadiya.com/images/IMG_7213.webp",
+      "telephone": ["+27814687186", "+263718735172"],
+      "email": "info@mamoegabhadiya.com",
+      "address": [
+        {
+          "@type": "PostalAddress",
+          "addressCountry": "ZA",
+          "addressRegion": "Gauteng",
+          "addressLocality": "Johannesburg"
+        },
+        {
+          "@type": "PostalAddress",
+          "addressCountry": "ZW",
+          "addressLocality": "Harare"
+        }
+      ],
+      "openingHours": "Mo-Su 08:00-20:00",
+      "sameAs": [
+        "https://wa.me/27814687186",
+        "https://wa.me/263718735172"
+      ]
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-earth">
+      <SEO 
+        title="Contact Mamoe Gabhadiya | WhatsApp Orders & Herbal Product Inquiries"
+        description="Contact Mamoe Gabhadiya for herbal product orders and inquiries. WhatsApp: +27 81 468 7186 (SA) | +263 718 735 172 (ZW). Fast response, expert advice, secure ordering. Get in touch today!"
+        keywords="contact mamoe gabhadiya, whatsapp herbal orders, herbal product inquiries, african herbs contact, natural health consultation, herbal product support, mamoe gabhadiya phone, mamoe gabhadiya whatsapp, herbal products south africa contact, zimbabwe herbal products contact, order herbs whatsapp, herbal consultation, natural medicine advice"
+        url="https://mamoegabhadiya.com/contact"
+        schemaData={contactPageSchema}
+      />
       <Navigation />
       
       <main className="pt-16">
@@ -154,9 +200,10 @@ const Contact = () => {
                     <Button
                       type="submit"
                       size="lg"
-                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                      className="w-full bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2"
                     >
-                      Send Message <Send className="ml-2 h-5 w-5" />
+                      <MessageCircle className="h-5 w-5" />
+                      Send via WhatsApp
                     </Button>
                   </form>
                 </CardContent>
@@ -167,10 +214,112 @@ const Contact = () => {
               <Card className="bg-gradient-card shadow-soft">
                 <CardContent className="p-8">
                   <h2 className="font-serif text-3xl font-bold text-card-foreground mb-6">
-                    Our Branches
+                    Contact Information
                   </h2>
                   
                   <div className="space-y-6">
+                    {/* WhatsApp Contact */}
+                    {/* SA WhatsApp Contact */}
+                    <a 
+                      href="https://wa.me/27814687186" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-start space-x-4 p-4 rounded-lg bg-muted/30 hover:bg-primary/10 transition-colors group cursor-pointer"
+                    >
+                      <div className="flex-shrink-0">
+                        <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center group-hover:bg-green-500/20 transition-colors">
+                          <MessageCircle className="h-6 w-6 text-green-600" />
+                        </div>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg text-foreground mb-1 group-hover:text-primary transition-colors">
+                          WhatsApp (South Africa)
+                        </h3>
+                        <p className="text-muted-foreground text-sm">+27 81 468 7186</p>
+                        <p className="text-xs text-green-600 mt-1">Click to chat with us instantly!</p>
+                      </div>
+                    </a>
+
+                    {/* ZW WhatsApp Contact */}
+                    <a 
+                      href="https://wa.me/263718735172" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-start space-x-4 p-4 rounded-lg bg-muted/30 hover:bg-primary/10 transition-colors group cursor-pointer"
+                    >
+                      <div className="flex-shrink-0">
+                        <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center group-hover:bg-green-500/20 transition-colors">
+                          <MessageCircle className="h-6 w-6 text-green-600" />
+                        </div>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg text-foreground mb-1 group-hover:text-primary transition-colors">
+                          WhatsApp (Zimbabwe)
+                        </h3>
+                        <p className="text-muted-foreground text-sm">+263 718 735 172</p>
+                        <p className="text-xs text-green-600 mt-1">Click to chat with us instantly!</p>
+                      </div>
+                    </a>
+
+                    {/* Phone Contact */}
+                    {/* SA Phone Contact */}
+                    <a 
+                      href="tel:+27814687186" 
+                      className="flex items-start space-x-4 p-4 rounded-lg bg-muted/30 hover:bg-primary/10 transition-colors group cursor-pointer"
+                    >
+                      <div className="flex-shrink-0">
+                        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                          <Phone className="h-6 w-6 text-primary" />
+                        </div>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg text-foreground mb-1 group-hover:text-primary transition-colors">
+                          Phone (South Africa)
+                        </h3>
+                        <p className="text-muted-foreground text-sm">+27 81 468 7186</p>
+                        <p className="text-xs text-primary mt-1">Click to call us directly</p>
+                      </div>
+                    </a>
+
+                    {/* ZW Phone Contact */}
+                    <a 
+                      href="tel:+263718735172" 
+                      className="flex items-start space-x-4 p-4 rounded-lg bg-muted/30 hover:bg-primary/10 transition-colors group cursor-pointer"
+                    >
+                      <div className="flex-shrink-0">
+                        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                          <Phone className="h-6 w-6 text-primary" />
+                        </div>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg text-foreground mb-1 group-hover:text-primary transition-colors">
+                          Phone (Zimbabwe)
+                        </h3>
+                        <p className="text-muted-foreground text-sm">+263 718 735 172</p>
+                        <p className="text-xs text-primary mt-1">Click to call us directly</p>
+                      </div>
+                    </a>
+
+                    {/* Email Contact */}
+                    <a 
+                      href="mailto:info@mamoegabhadiya.com" 
+                      className="flex items-start space-x-4 p-4 rounded-lg bg-muted/30 hover:bg-primary/10 transition-colors group cursor-pointer"
+                    >
+                      <div className="flex-shrink-0">
+                        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                          <Mail className="h-6 w-6 text-primary" />
+                        </div>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg text-foreground mb-1 group-hover:text-primary transition-colors">
+                          Email
+                        </h3>
+                        <p className="text-muted-foreground text-sm">info@mamoegabhadiya.com</p>
+                        <p className="text-xs text-primary mt-1">Click to send us an email</p>
+                      </div>
+                    </a>
+
+                    {/* Physical Locations */}
                     {branches.map((branch, index) => (
                       <div
                         key={index}

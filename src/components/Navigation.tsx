@@ -1,12 +1,15 @@
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Leaf } from "lucide-react";
+import { Menu, X, Leaf, MessageCircle, ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import { Button } from "./ui/button";
+import { Badge } from "./ui/badge";
 import { scrollToTopImmediate } from "@/hooks/use-scroll-to-top";
+import { useCart } from "@/contexts/CartContext";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const { toggleCart, getTotalItems } = useCart();
 
   const navItems = [
     { name: "Home", path: "/" },
@@ -51,18 +54,70 @@ const Navigation = () => {
                 {item.name}
               </Link>
             ))}
+            
+            {/* Shopping Cart */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleCart}
+              className="ml-4 relative"
+              title="Shopping Cart"
+            >
+              <ShoppingCart className="h-5 w-5" />
+              {getTotalItems() > 0 && (
+                <Badge 
+                  variant="destructive" 
+                  className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                >
+                  {getTotalItems()}
+                </Badge>
+              )}
+            </Button>
+
+            {/* WhatsApp Quick Contact */}
+            <a
+              href="https://wa.me/27814687186"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-2 p-2 rounded-full bg-green-600 hover:bg-green-700 text-white transition-colors group"
+              title="Chat with us on WhatsApp"
+            >
+              <MessageCircle className="h-5 w-5 group-hover:scale-110 transition-transform" />
+            </a>
           </div>
 
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="lg:hidden p-2 rounded-md hover:bg-muted transition-colors"
-          >
-            {isOpen ? (
-              <X className="h-6 w-6" />
-            ) : (
-              <Menu className="h-6 w-6" />
-            )}
-          </button>
+          <div className="lg:hidden flex items-center gap-2">
+            {/* Mobile Cart Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleCart}
+              className="relative p-2"
+              title="Shopping Cart"
+            >
+              <ShoppingCart className="h-5 w-5" />
+              {getTotalItems() > 0 && (
+                <Badge 
+                  variant="destructive" 
+                  className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center p-0 text-xs"
+                >
+                  {getTotalItems()}
+                </Badge>
+              )}
+            </Button>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="p-2 rounded-md hover:bg-muted transition-colors"
+            >
+              {isOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
+            </button>
+          </div>
         </div>
 
         {isOpen && (
@@ -82,6 +137,36 @@ const Navigation = () => {
                   {item.name}
                 </Link>
               ))}
+              
+              {/* Mobile Cart Link */}
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  toggleCart();
+                  setIsOpen(false);
+                }}
+                className="flex items-center justify-start px-4 py-2 rounded-md text-sm font-medium hover:bg-muted transition-colors"
+              >
+                <ShoppingCart className="h-4 w-4 mr-2" />
+                Shopping Cart
+                {getTotalItems() > 0 && (
+                  <Badge variant="destructive" className="ml-2">
+                    {getTotalItems()}
+                  </Badge>
+                )}
+              </Button>
+              
+              {/* Mobile WhatsApp Contact */}
+              <a
+                href="https://wa.me/27814687186"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center px-4 py-2 rounded-md text-sm font-medium bg-green-600 text-white hover:bg-green-700 transition-colors"
+              >
+                <MessageCircle className="h-4 w-4 mr-2" />
+                WhatsApp Chat
+              </a>
             </div>
           </div>
         )}

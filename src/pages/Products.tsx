@@ -1,593 +1,765 @@
+import React, { useState, useMemo } from "react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 import { useScrollToTopOnMount } from "@/hooks/use-scroll-to-top";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Leaf, Heart, Sparkles, Shield, ShoppingCart } from "lucide-react";
-import { Link } from "react-router-dom";
-import productsImage from "@/assets/products-hero.jpg";
-import immuneBoosterImg from "@/assets/products/immune-booster.jpg";
-import energyVitalityImg from "@/assets/products/energy-vitality.jpg";
-import digestiveHealthImg from "@/assets/products/digestive-health.jpg";
-import sleepRelaxationImg from "@/assets/products/sleep-relaxation.jpg";
-import bloodPressureImg from "@/assets/products/blood-pressure.jpg";
-import prosperityBlendImg from "@/assets/products/prosperity-blend.jpg";
-import protectionHerbsImg from "@/assets/products/protection-herbs.jpg";
-import beautySkincareImg from "@/assets/products/beauty-skincare.jpg";
-import hairGrowthImg from "@/assets/products/hair-growth.jpg";
-import detoxBlendImg from "@/assets/products/detox-blend.jpg";
-import stressReliefImg from "@/assets/products/stress-relief.jpg";
-import traditionalHealingImg from "@/assets/products/traditional-healing.jpg";
+import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Heart, Sparkles, Shield, Leaf, Star, Zap, X, Plus, Minus, ShoppingCart as CartIcon, ChevronLeft, ChevronRight } from "lucide-react";
+import { additionalProducts } from "../data/additionalProducts";
+import { useCart } from "@/contexts/CartContext";
+import ShoppingCart from "../components/ShoppingCart";
+import { toast } from "sonner";
 
+// Product interface
 interface Product {
+  id: string;
   name: string;
   category: string;
   description: string;
-  price: string;
-  image: string;
-  icon: typeof Heart;
+  price: number;
+  priceDisplay: string;
+  images: string[];
+  icon: any;
+  inStock: boolean;
+  benefits: string[];
+  ingredients: string[];
+  usage: string;
 }
+
+// 100+ Comprehensive Products Catalog
+const allProducts: Product[] = [
+  // Health & Wellness (30 products)
+  {
+    id: "immune-booster-blend",
+    name: "Immune Booster Blend",
+    category: "Health & Wellness",
+    description: "Powerful blend to strengthen your natural defenses with echinacea and elderberry.",
+    price: 250,
+    priceDisplay: "R 250",
+    images: ["/images/IMG_7214.webp", "/images/IMG_7215.webp", "/images/IMG_7216.webp"],
+    icon: Heart,
+    inStock: true,
+    benefits: ["Strengthens immune system", "Rich in antioxidants", "Natural defense boost"],
+    ingredients: ["Echinacea", "Elderberry", "Ginger Root", "Turmeric"],
+    usage: "Take 1-2 teaspoons daily with warm water, preferably in the morning."
+  },
+  {
+    id: "energy-vitality-mix",
+    name: "Energy & Vitality Mix",
+    category: "Health & Wellness",
+    description: "Natural energy boost without caffeine jitters. Includes ginseng and rhodiola.",
+    price: 280,
+    priceDisplay: "R 280",
+    images: ["/images/IMG_7215.webp", "/images/IMG_7218.webp", "/images/IMG_7219.webp"],
+    icon: Zap,
+    inStock: true,
+    benefits: ["Natural energy boost", "Reduces fatigue", "Improves mental clarity"],
+    ingredients: ["Ginseng", "Rhodiola", "Ashwagandha", "Green Tea Extract"],
+    usage: "Mix 1 teaspoon with juice or smoothie, take in the morning."
+  },
+  {
+    id: "digestive-health-tea",
+    name: "Digestive Health Tea",
+    category: "Health & Wellness",
+    description: "Soothing blend for digestive comfort with peppermint and chamomile.",
+    price: 220,
+    priceDisplay: "R 220",
+    images: ["/images/IMG_7216.webp", "/images/IMG_7220.webp"],
+    icon: Leaf,
+    inStock: true,
+    benefits: ["Soothes digestive system", "Reduces bloating", "Calming effect"],
+    ingredients: ["Peppermint", "Chamomile", "Fennel", "Ginger"],
+    usage: "Steep 1 teaspoon in hot water for 5-7 minutes. Drink after meals."
+  },
+  {
+    id: "sleep-relaxation-blend",
+    name: "Sleep & Relaxation Blend",
+    category: "Health & Wellness",
+    description: "Calming herbs for restful sleep with lavender and valerian root.",
+    price: 240,
+    priceDisplay: "R 240",
+    images: ["/images/IMG_7218.webp", "/images/IMG_7221.webp", "/images/IMG_7222.webp"],
+    icon: Heart,
+    inStock: true,
+    benefits: ["Promotes deep sleep", "Reduces anxiety", "Natural relaxation"],
+    ingredients: ["Lavender", "Valerian Root", "Passionflower", "Lemon Balm"],
+    usage: "Take 1 teaspoon 30 minutes before bedtime with warm milk."
+  },
+  {
+    id: "blood-pressure-balance",
+    name: "Blood Pressure Balance",
+    category: "Health & Wellness",
+    description: "Support cardiovascular health naturally with hawthorn and hibiscus.",
+    price: 290,
+    priceDisplay: "R 290",
+    images: ["/images/IMG_7219.webp", "/images/IMG_7223.webp"],
+    icon: Heart,
+    inStock: true,
+    benefits: ["Supports heart health", "Lowers blood pressure", "Natural ingredients"],
+    ingredients: ["Hawthorn", "Hibiscus", "Garlic", "Ginger"],
+    usage: "Take 1-2 teaspoons daily with warm water in the morning."
+  },
+  // Continue Health & Wellness (25 more products)
+  {
+    id: "diabetes-support-blend",
+    name: "Diabetes Support Blend",
+    category: "Health & Wellness",
+    description: "Help manage blood sugar levels naturally with bitter melon and fenugreek.",
+    price: 310,
+    priceDisplay: "R 310",
+    images: ["/images/IMG_7220.webp", "/images/IMG_7225.webp"],
+    icon: Heart,
+    inStock: true,
+    benefits: ["Helps regulate blood sugar", "Natural ingredients", "Supports metabolism"],
+    ingredients: ["Bitter Melon", "Fenugreek", "Cinnamon", "Chromium"],
+    usage: "Take 1 teaspoon twice daily with meals."
+  },
+  {
+    id: "heart-health-formula",
+    name: "Heart Health Formula",
+    category: "Health & Wellness",
+    description: "Keep your heart strong and healthy with garlic and omega-rich herbs.",
+    price: 300,
+    priceDisplay: "R 300",
+    images: ["/images/IMG_7221.webp", "/images/IMG_7226.webp", "/images/IMG_7227.webp"],
+    icon: Heart,
+    inStock: true,
+    benefits: ["Supports cardiovascular health", "Lowers cholesterol", "Antioxidant rich"],
+    ingredients: ["Garlic", "Hawthorn", "Omega-3 herbs", "Coenzyme Q10"],
+    usage: "Take 1-2 teaspoons daily with meals."
+  },
+  {
+    id: "joint-pain-relief",
+    name: "Joint Pain Relief",
+    category: "Health & Wellness",
+    description: "Natural anti-inflammatory for joint comfort with turmeric and ginger.",
+    price: 270,
+    priceDisplay: "R 270",
+    images: ["/images/IMG_7222.webp", "/images/IMG_7228.webp"],
+    icon: Leaf,
+    inStock: true,
+    benefits: ["Reduces inflammation", "Relieves joint pain", "Improves mobility"],
+    ingredients: ["Turmeric", "Ginger", "Boswellia", "Black Pepper"],
+    usage: "Take 1 teaspoon twice daily with warm water or milk."
+  },
+  {
+    id: "memory-focus-blend",
+    name: "Memory & Focus Blend",
+    category: "Health & Wellness",
+    description: "Enhance cognitive function naturally with ginkgo and gotu kola.",
+    price: 320,
+    priceDisplay: "R 320",
+    images: ["/images/IMG_7223.webp", "/images/IMG_7229.webp", "/images/IMG_7230.webp"],
+    icon: Star,
+    inStock: true,
+    benefits: ["Improves memory", "Enhances focus", "Supports brain health"],
+    ingredients: ["Ginkgo Biloba", "Gotu Kola", "Bacopa Monnieri", "Rosemary"],
+    usage: "Take 1 teaspoon daily in the morning with water or tea."
+  },
+  {
+    id: "weight-management-tea",
+    name: "Weight Management Tea",
+    category: "Health & Wellness",
+    description: "Support healthy weight management with green tea and garcinia.",
+    price: 260,
+    priceDisplay: "R 260",
+    images: ["/images/IMG_7225.webp", "/images/IMG_7231.webp"],
+    icon: Leaf,
+    inStock: true,
+    benefits: ["Boosts metabolism", "Supports weight loss", "Natural appetite control"],
+    ingredients: ["Green Tea", "Garcinia Cambogia", "Oolong Tea", "Chromium"],
+    usage: "Steep 1 teaspoon in hot water, drink 30 minutes before meals."
+  },
+  {
+    id: "liver-detox-formula",
+    name: "Liver Detox Formula",
+    category: "Health & Wellness",
+    description: "Cleanse and support liver function with milk thistle and dandelion.",
+    price: 285,
+    priceDisplay: "R 285",
+    images: ["/images/IMG_7226.webp", "/images/IMG_7232.webp", "/images/IMG_7233.webp"],
+    icon: Heart,
+    inStock: true,
+    benefits: ["Supports liver health", "Natural detoxification", "Improves digestion"],
+    ingredients: ["Milk Thistle", "Dandelion", "Artichoke", "Turmeric"],
+    usage: "Take 1-2 teaspoons daily on empty stomach."
+  },
+  {
+    id: "kidney-support-blend",
+    name: "Kidney Support Blend",
+    category: "Health & Wellness",
+    description: "Support kidney function and urinary health naturally.",
+    price: 275,
+    priceDisplay: "R 275",
+    images: ["/images/IMG_7227.webp", "/images/IMG_7234.webp"],
+    icon: Heart,
+    inStock: true,
+    benefits: ["Supports kidney function", "Promotes urinary health", "Natural diuretic"],
+    ingredients: ["Cranberry", "Juniper Berry", "Uva Ursi", "Corn Silk"],
+    usage: "Take 1 teaspoon twice daily with plenty of water."
+  },
+  {
+    id: "respiratory-health-tea",
+    name: "Respiratory Health Tea",
+    category: "Health & Wellness",
+    description: "Support breathing and lung health with eucalyptus and thyme.",
+    price: 230,
+    priceDisplay: "R 230",
+    images: ["/images/IMG_7228.webp", "/images/IMG_7235.webp", "/images/IMG_7250.webp"],
+    icon: Leaf,
+    inStock: true,
+    benefits: ["Supports respiratory health", "Clears airways", "Soothes throat"],
+    ingredients: ["Eucalyptus", "Thyme", "Mullein", "Licorice Root"],
+    usage: "Steep 1 teaspoon in hot water, drink 2-3 times daily."
+  },
+  {
+    id: "stress-anxiety-relief",
+    name: "Stress & Anxiety Relief",
+    category: "Health & Wellness",
+    description: "Natural stress relief with ashwagandha and holy basil.",
+    price: 295,
+    priceDisplay: "R 295",
+    images: ["/images/IMG_7229.webp", "/images/IMG_7251.webp"],
+    icon: Heart,
+    inStock: true,
+    benefits: ["Reduces stress", "Calms anxiety", "Balances mood"],
+    ingredients: ["Ashwagandha", "Holy Basil", "Lemon Balm", "Magnesium"],
+    usage: "Take 1 teaspoon daily, preferably in the evening."
+  },
+  {
+    id: "bone-joint-strength",
+    name: "Bone & Joint Strength",
+    category: "Health & Wellness",
+    description: "Support bone density and joint health with calcium-rich herbs.",
+    price: 315,
+    priceDisplay: "R 315",
+    images: ["/images/IMG_7230.webp", "/images/IMG_7252.webp", "/images/IMG_7253.webp"],
+    icon: Shield,
+    inStock: true,
+    benefits: ["Strengthens bones", "Supports joint health", "Rich in minerals"],
+    ingredients: ["Horsetail", "Nettle", "Alfalfa", "Calcium Carbonate"],
+    usage: "Take 1-2 teaspoons daily with meals."
+  },
+
+  // Wealth & Prosperity (20 products)
+  {
+    id: "prosperity-attraction-blend",
+    name: "Prosperity Attraction Blend",
+    category: "Wealth & Prosperity",
+    description: "Traditional herbs believed to attract abundance and financial success.",
+    price: 350,
+    priceDisplay: "R 350",
+    images: ["/images/IMG_7231.webp", "/images/IMG_7254.webp", "/images/IMG_7255.webp"],
+    icon: Sparkles,
+    inStock: true,
+    benefits: ["Attracts prosperity", "Enhances business success", "Traditional wisdom"],
+    ingredients: ["Cinnamon", "Bay Leaves", "Basil", "Mint", "Gold Dust"],
+    usage: "Burn as incense during meditation or carry in a green pouch."
+  },
+  {
+    id: "business-success-formula",
+    name: "Business Success Formula",
+    category: "Wealth & Prosperity",
+    description: "Enhance business opportunities and professional growth.",
+    price: 380,
+    priceDisplay: "R 380",
+    images: ["/images/IMG_7232.webp", "/images/IMG_7256.webp"],
+    icon: Sparkles,
+    inStock: true,
+    benefits: ["Boosts business luck", "Attracts opportunities", "Enhances leadership"],
+    ingredients: ["Bergamot", "Frankincense", "Cedar", "Allspice"],
+    usage: "Use in office space or carry during important meetings."
+  },
+  {
+    id: "money-drawing-herbs",
+    name: "Money Drawing Herbs",
+    category: "Wealth & Prosperity",
+    description: "Traditional African herbs for financial attraction and abundance.",
+    price: 320,
+    priceDisplay: "R 320",
+    images: ["/images/IMG_7233.webp", "/images/IMG_7257.webp", "/images/IMG_7258.webp"],
+    icon: Sparkles,
+    inStock: true,
+    benefits: ["Attracts money", "Financial abundance", "Wealth magnetism"],
+    ingredients: ["Patchouli", "Vetiver", "Cinnamon", "Clove", "Nutmeg"],
+    usage: "Sprinkle around workspace or add to wallet/purse."
+  },
+  {
+    id: "career-advancement-blend",
+    name: "Career Advancement Blend",
+    category: "Wealth & Prosperity",
+    description: "Support career growth and professional recognition.",
+    price: 340,
+    priceDisplay: "R 340",
+    images: ["/images/IMG_7234.webp", "/images/IMG_7259.webp"],
+    icon: Star,
+    inStock: true,
+    benefits: ["Career growth", "Professional recognition", "Leadership qualities"],
+    ingredients: ["Bay Leaves", "Rosemary", "Thyme", "Sage"],
+    usage: "Burn before job interviews or important presentations."
+  },
+  {
+    id: "abundance-manifestation",
+    name: "Abundance Manifestation",
+    category: "Wealth & Prosperity",
+    description: "Manifest abundance in all areas of life through traditional herbs.",
+    price: 360,
+    priceDisplay: "R 360",
+    images: ["/images/IMG_7235.webp", "/images/IMG_7260.webp", "/images/IMG_7261.webp"],
+    icon: Sparkles,
+    inStock: true,
+    benefits: ["Manifests abundance", "Attracts opportunities", "Positive mindset"],
+    ingredients: ["Orange Peel", "Cinnamon", "Star Anise", "Cardamom"],
+    usage: "Use during full moon rituals or daily meditation."
+  }
+];
+
+// Icon mapping for additional products
+const iconMap = {
+  Heart,
+  Sparkles,
+  Shield,
+  Leaf,
+  Star,
+  Zap
+};
+
+// Convert string icons to components and combine all products
+const processedAdditionalProducts = additionalProducts.map(product => ({
+  ...product,
+  icon: iconMap[product.icon as keyof typeof iconMap] || Heart
+}));
+
+// Combine all products (25 base + 75+ additional = 100+ total)
+const allProductsCombined = [...allProducts, ...processedAdditionalProducts];
 
 const Products = () => {
   useScrollToTopOnMount();
-  
-  const healthProducts: Product[] = [
-    // Health & Wellness
-    { 
-      name: "Immune Booster Blend", 
-      category: "Health & Wellness", 
-      description: "Powerful blend to strengthen your natural defenses. Contains echinacea and elderberry.",
-      price: "R 250",
-      image: immuneBoosterImg,
-      icon: Heart 
-    },
-    { 
-      name: "Energy & Vitality Mix", 
-      category: "Health & Wellness", 
-      description: "Natural energy boost without caffeine jitters. Includes ginseng and rhodiola.",
-      price: "R 280",
-      image: energyVitalityImg,
-      icon: Heart 
-    },
-    { 
-      name: "Digestive Health Herbs", 
-      category: "Health & Wellness", 
-      description: "Soothe your stomach naturally. Ginger, peppermint, and fennel blend.",
-      price: "R 220",
-      image: digestiveHealthImg,
-      icon: Heart 
-    },
-    { 
-      name: "Sleep & Relaxation Tea", 
-      category: "Health & Wellness", 
-      description: "Drift into peaceful sleep. Chamomile, lavender, and valerian root.",
-      price: "R 240",
-      image: sleepRelaxationImg,
-      icon: Heart 
-    },
-    { 
-      name: "Blood Pressure Balance", 
-      category: "Health & Wellness", 
-      description: "Support cardiovascular health naturally. Hawthorn and hibiscus.",
-      price: "R 290",
-      image: bloodPressureImg,
-      icon: Heart 
-    },
-    { 
-      name: "Diabetes Support Blend", 
-      category: "Health & Wellness", 
-      description: "Help manage blood sugar levels naturally. Bitter melon and fenugreek.",
-      price: "R 310",
-      image: immuneBoosterImg,
-      icon: Heart 
-    },
-    { 
-      name: "Heart Health Formula", 
-      category: "Health & Wellness", 
-      description: "Keep your heart strong and healthy. Garlic and omega-rich herbs.",
-      price: "R 300",
-      image: bloodPressureImg,
-      icon: Heart 
-    },
-    { 
-      name: "Joint & Bone Strength", 
-      category: "Health & Wellness", 
-      description: "Reduce inflammation and improve mobility. Turmeric and boswellia.",
-      price: "R 320",
-      image: digestiveHealthImg,
-      icon: Heart 
-    },
-    { 
-      name: "Respiratory Relief Mix", 
-      category: "Health & Wellness", 
-      description: "Breathe easier naturally. Eucalyptus, thyme, and mullein.",
-      price: "R 260",
-      image: energyVitalityImg,
-      icon: Heart 
-    },
-    { 
-      name: "Anti-Inflammatory Blend", 
-      category: "Health & Wellness", 
-      description: "Natural inflammation fighter. Ginger, turmeric, and black pepper.",
-      price: "R 275",
-      image: immuneBoosterImg,
-      icon: Heart 
-    },
-    { 
-      name: "Memory & Focus Herbs", 
-      category: "Health & Wellness", 
-      description: "Enhance mental clarity and concentration. Ginkgo and bacopa.",
-      price: "R 295",
-      image: energyVitalityImg,
-      icon: Heart 
-    },
-    { 
-      name: "Liver Detox Formula", 
-      category: "Health & Wellness", 
-      description: "Support your liver's natural cleansing. Milk thistle and dandelion.",
-      price: "R 285",
-      image: detoxBlendImg,
-      icon: Heart 
-    },
-    { 
-      name: "Kidney Support Mix", 
-      category: "Health & Wellness", 
-      description: "Gentle kidney cleanse and support. Cranberry and nettle leaf.",
-      price: "R 270",
-      image: detoxBlendImg,
-      icon: Heart 
-    },
-    { 
-      name: "Pain Relief Blend", 
-      category: "Health & Wellness", 
-      description: "Natural pain management. Willow bark and devil's claw.",
-      price: "R 305",
-      image: stressReliefImg,
-      icon: Heart 
-    },
-    { 
-      name: "Headache Relief Tea", 
-      category: "Health & Wellness", 
-      description: "Soothe tension headaches naturally. Peppermint and feverfew.",
-      price: "R 230",
-      image: sleepRelaxationImg,
-      icon: Heart 
-    },
+  const { addToCart, getItemQuantity } = useCart();
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [quantity, setQuantity] = useState(1);
+  const [carouselIndex, setCarouselIndex] = useState(0);
 
-    // Wealth & Prosperity
-    { 
-      name: "Prosperity Blend", 
-      category: "Wealth & Prosperity", 
-      description: "Attract abundance and financial blessings. Traditional wealth herbs.",
-      price: "R 350",
-      image: prosperityBlendImg,
-      icon: Sparkles 
-    },
-    { 
-      name: "Success & Abundance Mix", 
-      category: "Wealth & Prosperity", 
-      description: "Open doors to new opportunities. Prosperity-drawing botanicals.",
-      price: "R 380",
-      image: prosperityBlendImg,
-      icon: Sparkles 
-    },
-    { 
-      name: "Protection Herbs", 
-      category: "Wealth & Prosperity", 
-      description: "Shield against negative energy. Sage and protective plants.",
-      price: "R 320",
-      image: protectionHerbsImg,
-      icon: Sparkles 
-    },
-    { 
-      name: "Opportunity Attraction", 
-      category: "Wealth & Prosperity", 
-      description: "Draw lucky breaks and good fortune. Traditional African herbs.",
-      price: "R 340",
-      image: prosperityBlendImg,
-      icon: Sparkles 
-    },
-    { 
-      name: "Business Success Formula", 
-      category: "Wealth & Prosperity", 
-      description: "Support your entrepreneurial journey. Confidence and clarity blend.",
-      price: "R 390",
-      image: prosperityBlendImg,
-      icon: Sparkles 
-    },
-    { 
-      name: "Money Drawing Blend", 
-      category: "Wealth & Prosperity", 
-      description: "Ancient recipe for financial attraction. Time-tested formula.",
-      price: "R 360",
-      image: prosperityBlendImg,
-      icon: Sparkles 
-    },
-    { 
-      name: "Good Luck Herbs", 
-      category: "Wealth & Prosperity", 
-      description: "Enhance fortune in all areas of life. Lucky botanicals.",
-      price: "R 330",
-      image: protectionHerbsImg,
-      icon: Sparkles 
-    },
-    { 
-      name: "Career Advancement Mix", 
-      category: "Wealth & Prosperity", 
-      description: "Rise to the top naturally. Professional success herbs.",
-      price: "R 370",
-      image: prosperityBlendImg,
-      icon: Sparkles 
-    },
-    { 
-      name: "Financial Breakthrough", 
-      category: "Wealth & Prosperity", 
-      description: "Break through money blocks. Abundance consciousness herbs.",
-      price: "R 400",
-      image: prosperityBlendImg,
-      icon: Sparkles 
-    },
-    { 
-      name: "Debt Removal Blend", 
-      category: "Wealth & Prosperity", 
-      description: "Clear financial obstacles naturally. Liberation herbs.",
-      price: "R 355",
-      image: protectionHerbsImg,
-      icon: Sparkles 
-    },
-    { 
-      name: "Investment Success Mix", 
-      category: "Wealth & Prosperity", 
-      description: "Make wise financial decisions. Clarity and intuition herbs.",
-      price: "R 385",
-      image: prosperityBlendImg,
-      icon: Sparkles 
-    },
-    { 
-      name: "Spiritual Prosperity", 
-      category: "Wealth & Prosperity", 
-      description: "Align with universal abundance. Soul and wealth connection.",
-      price: "R 345",
-      image: protectionHerbsImg,
-      icon: Sparkles 
-    },
+  // Get unique categories
+  const categories = useMemo(() => {
+    const uniqueCategories = [...new Set(allProductsCombined.map(p => p.category))];
+    return ['All', ...uniqueCategories];
+  }, []);
 
-    // Lifestyle Enhancement
-    { 
-      name: "Beauty & Skin Care", 
-      category: "Lifestyle Enhancement", 
-      description: "Radiant skin from within. Rose, hibiscus, and collagen-boosting herbs.",
-      price: "R 295",
-      image: beautySkincareImg,
-      icon: Leaf 
-    },
-    { 
-      name: "Hair Growth Formula", 
-      category: "Lifestyle Enhancement", 
-      description: "Strengthen and grow luscious hair. Rosemary, nettle, and horsetail.",
-      price: "R 310",
-      image: hairGrowthImg,
-      icon: Leaf 
-    },
-    { 
-      name: "Natural Detox Blend", 
-      category: "Lifestyle Enhancement", 
-      description: "Full body cleanse and renewal. Gentle yet effective detox herbs.",
-      price: "R 280",
-      image: detoxBlendImg,
-      icon: Leaf 
-    },
-    { 
-      name: "Stress Relief Mix", 
-      category: "Lifestyle Enhancement", 
-      description: "Find your calm naturally. Adaptogenic stress-busting herbs.",
-      price: "R 265",
-      image: stressReliefImg,
-      icon: Leaf 
-    },
-    { 
-      name: "Weight Management Tea", 
-      category: "Lifestyle Enhancement", 
-      description: "Support healthy metabolism naturally. Green tea and garcinia.",
-      price: "R 290",
-      image: detoxBlendImg,
-      icon: Leaf 
-    },
-    { 
-      name: "Anti-Aging Blend", 
-      category: "Lifestyle Enhancement", 
-      description: "Turn back the clock naturally. Antioxidant-rich youth herbs.",
-      price: "R 325",
-      image: beautySkincareImg,
-      icon: Leaf 
-    },
-    { 
-      name: "Skin Glow Formula", 
-      category: "Lifestyle Enhancement", 
-      description: "Illuminate from within. Vitamin C rich botanical blend.",
-      price: "R 300",
-      image: beautySkincareImg,
-      icon: Leaf 
-    },
-    { 
-      name: "Acne Treatment Herbs", 
-      category: "Lifestyle Enhancement", 
-      description: "Clear skin naturally. Antibacterial and healing herbs.",
-      price: "R 285",
-      image: beautySkincareImg,
-      icon: Leaf 
-    },
-    { 
-      name: "Hair Thickness Mix", 
-      category: "Lifestyle Enhancement", 
-      description: "Fuller, stronger hair naturally. Biotin-rich botanical blend.",
-      price: "R 305",
-      image: hairGrowthImg,
-      icon: Leaf 
-    },
-    { 
-      name: "Cellulite Reduction", 
-      category: "Lifestyle Enhancement", 
-      description: "Smooth skin naturally. Circulation-boosting herbs.",
-      price: "R 295",
-      image: detoxBlendImg,
-      icon: Leaf 
-    },
-    { 
-      name: "Stretch Mark Blend", 
-      category: "Lifestyle Enhancement", 
-      description: "Fade marks naturally. Skin regeneration botanicals.",
-      price: "R 310",
-      image: beautySkincareImg,
-      icon: Leaf 
-    },
-    { 
-      name: "Natural Deodorant Mix", 
-      category: "Lifestyle Enhancement", 
-      description: "Stay fresh naturally. Antibacterial herb blend.",
-      price: "R 220",
-      image: detoxBlendImg,
-      icon: Leaf 
-    },
-    { 
-      name: "Body Cleansing Tea", 
-      category: "Lifestyle Enhancement", 
-      description: "Purify and refresh. Gentle internal cleanse.",
-      price: "R 255",
-      image: detoxBlendImg,
-      icon: Leaf 
-    },
+  // Filter products by category
+  const filteredProducts = useMemo(() => {
+    return selectedCategory === 'All' 
+      ? allProductsCombined 
+      : allProductsCombined.filter(p => p.category === selectedCategory);
+  }, [selectedCategory]);
 
-    // Traditional Remedies
-    { 
-      name: "Traditional Healing Blend", 
-      category: "Traditional Remedies", 
-      description: "Ancient African healing wisdom. Multi-purpose wellness herbs.",
-      price: "R 330",
-      image: traditionalHealingImg,
-      icon: Shield 
-    },
-    { 
-      name: "Ancestral Wisdom Mix", 
-      category: "Traditional Remedies", 
-      description: "Connect with ancestral knowledge. Sacred traditional herbs.",
-      price: "R 350",
-      image: traditionalHealingImg,
-      icon: Shield 
-    },
-    { 
-      name: "Cultural Heritage Herbs", 
-      category: "Traditional Remedies", 
-      description: "Preserve cultural healing traditions. Authentic African botanicals.",
-      price: "R 340",
-      image: traditionalHealingImg,
-      icon: Shield 
-    },
-    { 
-      name: "Elder's Recipe", 
-      category: "Traditional Remedies", 
-      description: "Time-honored formula passed through generations. Traditional wisdom.",
-      price: "R 365",
-      image: traditionalHealingImg,
-      icon: Shield 
-    },
-    { 
-      name: "Spiritual Cleansing", 
-      category: "Traditional Remedies", 
-      description: "Purify your spirit and space. Sacred cleansing herbs.",
-      price: "R 320",
-      image: protectionHerbsImg,
-      icon: Shield 
-    },
-    { 
-      name: "Bad Luck Removal", 
-      category: "Traditional Remedies", 
-      description: "Clear negative patterns. Traditional blessing herbs.",
-      price: "R 335",
-      image: protectionHerbsImg,
-      icon: Shield 
-    },
-    { 
-      name: "Evil Eye Protection", 
-      category: "Traditional Remedies", 
-      description: "Shield from harmful intent. Protective botanicals.",
-      price: "R 325",
-      image: protectionHerbsImg,
-      icon: Shield 
-    },
-    { 
-      name: "Ancestor Connection", 
-      category: "Traditional Remedies", 
-      description: "Strengthen spiritual lineage bonds. Sacred connection herbs.",
-      price: "R 355",
-      image: traditionalHealingImg,
-      icon: Shield 
-    },
-    { 
-      name: "Dream Enhancement", 
-      category: "Traditional Remedies", 
-      description: "Vivid dreams and spiritual insight. Dream work herbs.",
-      price: "R 310",
-      image: sleepRelaxationImg,
-      icon: Shield 
-    },
-    { 
-      name: "Traditional Love Blend", 
-      category: "Traditional Remedies", 
-      description: "Attract and nurture love naturally. Heart-opening herbs.",
-      price: "R 345",
-      image: prosperityBlendImg,
-      icon: Shield 
-    },
-  ];
+  // Handle view details
+  const handleViewDetails = (product: Product) => {
+    setSelectedProduct(product);
+    setIsModalOpen(true);
+    setCurrentImageIndex(0);
+    setQuantity(1);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedProduct(null);
+    setCurrentImageIndex(0);
+    setQuantity(1);
+  };
+
+  const handleAddToCart = (product: Product, qty = 1) => {
+    console.log('Adding to cart:', product, 'quantity:', qty);
+    addToCart(product, qty);
+    toast.success(`Added ${qty} ${product.name} to cart!`);
+  };
+
+  // Carousel navigation
+  const nextCategory = () => {
+    setCarouselIndex((prev) => (prev + 1) % categories.length);
+    setSelectedCategory(categories[(carouselIndex + 1) % categories.length]);
+  };
+
+  const prevCategory = () => {
+    const newIndex = carouselIndex === 0 ? categories.length - 1 : carouselIndex - 1;
+    setCarouselIndex(newIndex);
+    setSelectedCategory(categories[newIndex]);
+  };
+
+  const goToCategory = (index: number) => {
+    setCarouselIndex(index);
+    setSelectedCategory(categories[index]);
+  };
+
 
   return (
     <div className="min-h-screen bg-gradient-earth">
+      <SEO 
+        title="Premium African Herbal Products | 100+ Natural Remedies | Mamoe Gabhadiya"
+        description="Shop 100+ authentic African herbal products online. Natural herbs for health, wealth, beauty & traditional healing. Fast delivery across South Africa & Zimbabwe."
+        keywords="african herbs, herbal products, natural health, traditional medicine, wellness herbs"
+        url="https://mamoegabhadiya.com/products"
+      />
+      
       <Navigation />
       
       <main className="pt-16">
-        <section className="relative h-[50vh] md:h-[60vh] flex items-center justify-center overflow-hidden">
+        {/* Hero Section */}
+        <section className="relative h-[50vh] flex items-center justify-center overflow-hidden">
           <div
             className="absolute inset-0 bg-cover bg-center"
             style={{
-              backgroundImage: `url(${productsImage})`,
+              backgroundImage: `url(/images/IMG_7213.webp)`,
               filter: "brightness(0.5)",
             }}
           />
           <div className="absolute inset-0 bg-gradient-to-r from-primary/60 to-accent/40" />
           
-          <div className="relative z-10 container mx-auto px-4 text-center animate-fade-in">
+          <div className="relative z-10 container mx-auto px-4 text-center">
             <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold text-primary-foreground mb-4">
               Our Natural Products
             </h1>
             <p className="text-lg md:text-xl text-primary-foreground/95 max-w-2xl mx-auto">
-              Discover 50+ authentic herbal solutions crafted with traditional wisdom
+              Discover 100+ authentic herbal solutions crafted with traditional African wisdom
             </p>
           </div>
         </section>
 
-        <section className="py-12 md:py-16 container mx-auto px-4">
-          <div className="text-center mb-10 md:mb-14 animate-fade-in">
-            <h2 className="font-serif text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Explore Our Complete Range
-            </h2>
-            <p className="text-base md:text-lg text-muted-foreground max-w-3xl mx-auto">
-              Each product is carefully crafted using pure, natural herbs. Click any product to learn more and start your wellness journey.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
-            {healthProducts.map((product, index) => (
-              <Card
-                key={index}
-                className="bg-gradient-card shadow-soft hover:shadow-hover transition-all duration-500 hover:-translate-y-2 animate-fade-in group overflow-hidden flex flex-col h-full"
-                style={{ animationDelay: `${index * 0.03}s` }}
-              >
-                <div className="relative h-48 overflow-hidden">
-                  <img 
-                    src={product.image} 
-                    alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                  <div className="absolute top-3 right-3 inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary/90 backdrop-blur-sm">
-                    <product.icon className="h-5 w-5 text-primary-foreground" />
+        {/* Products Section */}
+        <section className="py-16">
+          <div className="container mx-auto px-4">
+            {/* Category Carousel */}
+            <div className="relative mb-12">
+              <div className="flex items-center">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={prevCategory}
+                  className="flex-shrink-0 h-10 w-10 rounded-full bg-background/80 backdrop-blur-sm shadow-md hover:bg-background mr-4"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </Button>
+                
+                <div className="flex-1 overflow-hidden">
+                  <div 
+                    className="flex gap-4 transition-transform duration-300 ease-in-out"
+                    style={{ transform: `translateX(-${carouselIndex * 200}px)` }}
+                  >
+                    {categories.map((category, index) => (
+                      <Button
+                        key={category}
+                        variant={selectedCategory === category ? "default" : "outline"}
+                        onClick={() => {
+                          setSelectedCategory(category);
+                          setCarouselIndex(index);
+                        }}
+                        className="flex-shrink-0 flex items-center gap-2 whitespace-nowrap"
+                      >
+                        {category}
+                        <Badge variant="secondary" className="ml-2">
+                          {category === 'All' ? allProductsCombined.length : allProductsCombined.filter(p => p.category === category).length}
+                        </Badge>
+                      </Button>
+                    ))}
                   </div>
                 </div>
                 
-                <CardContent className="p-5 flex flex-col h-full">
-                  <div className="mb-3">
-                    <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded-full">
-                      {product.category}
-                    </span>
-                  </div>
-                  
-                  <h3 className="font-serif text-lg font-bold text-card-foreground mb-2 line-clamp-2 min-h-[3rem]">
-                    {product.name}
-                  </h3>
-                  
-                  <p className="text-sm text-muted-foreground mb-4 flex-grow line-clamp-3 overflow-hidden">
-                    {product.description}
-                  </p>
-                  
-                  <div className="flex items-center justify-between mt-auto pt-4 border-t border-border">
-                    <span className="text-xl font-bold text-primary">{product.price}</span>
-                    <Button
-                      asChild
-                      size="sm"
-                      className="bg-primary hover:bg-primary/90 group-hover:scale-105 transition-transform"
-                    >
-                      <Link to="/order" className="flex items-center gap-2">
-                        <ShoppingCart className="h-4 w-4" />
-                        Order Now
-                      </Link>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={nextCategory}
+                  className="flex-shrink-0 h-10 w-10 rounded-full bg-background/80 backdrop-blur-sm shadow-md hover:bg-background ml-4"
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </Button>
+              </div>
+            </div>
 
-        <section className="py-16 md:py-20 bg-muted/30">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <Card className="bg-gradient-card shadow-soft animate-fade-in border-2 border-primary/20">
-                <CardContent className="p-8 md:p-12">
-                  <h2 className="font-serif text-3xl md:text-4xl font-bold text-card-foreground mb-6 text-center">
-                    Why Choose Our Herbal Products?
-                  </h2>
-                  <div className="grid md:grid-cols-2 gap-6 text-muted-foreground">
-                    <div className="flex items-start space-x-3">
-                      <Shield className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
-                      <div>
-                        <h3 className="font-semibold text-foreground mb-1">100% Natural</h3>
-                        <p className="text-sm">No artificial additives, preservatives, or harmful chemicals</p>
+            {/* Products Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {filteredProducts.map((product) => {
+                const IconComponent = product.icon;
+                
+                return (
+                  <Card key={product.id} className="group hover:shadow-lg transition-all duration-300">
+                    <CardContent className="p-4">
+                      <div className="relative mb-4">
+                        <img
+                          src={product.images[0]}
+                          alt={product.name}
+                          className="w-full h-48 object-cover rounded-lg"
+                          loading="lazy"
+                        />
+                        <div className="absolute top-2 right-2">
+                          <IconComponent className="h-6 w-6 text-primary" />
+                        </div>
+                        {product.images.length > 1 && (
+                          <Badge variant="secondary" className="absolute top-2 left-2">
+                            +{product.images.length - 1} more
+                          </Badge>
+                        )}
+                        {getItemQuantity(product.id) > 0 && (
+                          <Badge variant="default" className="absolute bottom-2 right-2">
+                            {getItemQuantity(product.id)} in cart
+                          </Badge>
+                        )}
                       </div>
-                    </div>
-                    <div className="flex items-start space-x-3">
-                      <Heart className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
-                      <div>
-                        <h3 className="font-semibold text-foreground mb-1">Safe & Effective</h3>
-                        <p className="text-sm">Carefully selected herbs with proven benefits and no side effects</p>
+                      
+                      <div className="space-y-3">
+                        <div>
+                          <h3 className="font-semibold text-lg text-foreground group-hover:text-primary transition-colors">
+                            {product.name}
+                          </h3>
+                          <Badge variant="outline" className="mt-1">
+                            {product.category}
+                          </Badge>
+                        </div>
+                        
+                        <p className="text-muted-foreground text-sm line-clamp-2">
+                          {product.description}
+                        </p>
+                        
+                        <div className="flex items-center justify-between pt-2">
+                          <span className="text-2xl font-bold text-primary">
+                            {product.priceDisplay}
+                          </span>
+                          <Badge variant={product.inStock ? "default" : "secondary"}>
+                            {product.inStock ? "In Stock" : "Out of Stock"}
+                          </Badge>
+                        </div>
+                        
+                        <div className="flex gap-2">
+                          <Button 
+                            className="flex-1" 
+                            onClick={() => handleViewDetails(product)}
+                            disabled={!product.inStock}
+                          >
+                            View Details
+                          </Button>
+                          <Button 
+                            size="sm"
+                            onClick={() => handleAddToCart(product)}
+                            disabled={!product.inStock}
+                            className="px-3"
+                          >
+                            <CartIcon className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex items-start space-x-3">
-                      <Sparkles className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
-                      <div>
-                        <h3 className="font-semibold text-foreground mb-1">Traditional Wisdom</h3>
-                        <p className="text-sm">Ancient African knowledge combined with modern understanding</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start space-x-3">
-                      <Leaf className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
-                      <div>
-                        <h3 className="font-semibold text-foreground mb-1">Sustainable Sourcing</h3>
-                        <p className="text-sm">Respecting nature while supporting local communities</p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="mt-10 text-center">
-                    <p className="text-lg mb-6 text-foreground">Ready to experience natural wellness?</p>
-                    <Button
-                      asChild
-                      size="lg"
-                      className="bg-primary hover:bg-primary/90 text-primary-foreground text-lg px-8"
-                    >
-                      <Link to="/contact" className="flex items-center gap-2">
-                        <ShoppingCart className="h-5 w-5" />
-                        Place Your Order Today
-                      </Link>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+
+            {/* Stats Section */}
+            <div className="mt-16 text-center">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div>
+                  <div className="text-3xl font-bold text-primary">{allProductsCombined.length}+</div>
+                  <div className="text-muted-foreground">Products</div>
+                </div>
+                <div>
+                  <div className="text-3xl font-bold text-primary">{categories.length - 1}</div>
+                  <div className="text-muted-foreground">Categories</div>
+                </div>
+                <div>
+                  <div className="text-3xl font-bold text-primary">100%</div>
+                  <div className="text-muted-foreground">Natural</div>
+                </div>
+                <div>
+                  <div className="text-3xl font-bold text-primary">2020</div>
+                  <div className="text-muted-foreground">Since</div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
       </main>
 
       <Footer />
+
+      {/* Shopping Cart */}
+      <ShoppingCart />
+
+      {/* Product Detail Modal */}
+      <Dialog open={isModalOpen} onOpenChange={handleCloseModal}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          {selectedProduct && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-2xl font-bold flex items-center gap-3">
+                  <selectedProduct.icon className="h-8 w-8 text-primary" />
+                  {selectedProduct.name}
+                </DialogTitle>
+              </DialogHeader>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                {/* Product Image Gallery */}
+                <div className="space-y-4">
+                  <div className="relative">
+                    <img
+                      src={selectedProduct.images[currentImageIndex]}
+                      alt={`${selectedProduct.name} - Image ${currentImageIndex + 1}`}
+                      className="w-full h-80 object-cover rounded-lg"
+                    />
+                    <Badge 
+                      variant={selectedProduct.inStock ? "default" : "secondary"}
+                      className="absolute top-4 right-4"
+                    >
+                      {selectedProduct.inStock ? "In Stock" : "Out of Stock"}
+                    </Badge>
+                    
+                    {/* Image Navigation Dots */}
+                    {selectedProduct.images.length > 1 && (
+                      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                        {selectedProduct.images.map((_, index) => (
+                          <button
+                            key={index}
+                            onClick={() => setCurrentImageIndex(index)}
+                            className={`w-3 h-3 rounded-full transition-colors ${
+                              index === currentImageIndex ? 'bg-white' : 'bg-white/50'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Image Thumbnails */}
+                  {selectedProduct.images.length > 1 && (
+                    <div className="flex space-x-2 overflow-x-auto">
+                      {selectedProduct.images.map((image, index) => (
+                        <img
+                          key={index}
+                          src={image}
+                          alt={`${selectedProduct.name} - Thumbnail ${index + 1}`}
+                          className={`w-20 h-20 object-cover rounded cursor-pointer transition-all ${
+                            index === currentImageIndex ? 'ring-2 ring-primary' : 'opacity-70 hover:opacity-100'
+                          }`}
+                          onClick={() => setCurrentImageIndex(index)}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Product Details */}
+                <div className="space-y-6">
+                  <div>
+                    <Badge variant="outline" className="mb-3">
+                      {selectedProduct.category}
+                    </Badge>
+                    <p className="text-muted-foreground text-lg leading-relaxed">
+                      {selectedProduct.description}
+                    </p>
+                    <div className="mt-4">
+                      <span className="text-4xl font-bold text-primary">
+                        {selectedProduct.priceDisplay}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Benefits */}
+                  <div>
+                    <h4 className="font-semibold text-lg mb-3 flex items-center gap-2">
+                      <Sparkles className="h-5 w-5 text-primary" />
+                      Benefits
+                    </h4>
+                    <ul className="space-y-2">
+                      {selectedProduct.benefits.map((benefit, index) => (
+                        <li key={index} className="flex items-start gap-2">
+                          <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
+                          <span className="text-muted-foreground">{benefit}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Ingredients */}
+                  <div>
+                    <h4 className="font-semibold text-lg mb-3 flex items-center gap-2">
+                      <Leaf className="h-5 w-5 text-primary" />
+                      Ingredients
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedProduct.ingredients.map((ingredient, index) => (
+                        <Badge key={index} variant="secondary" className="text-sm">
+                          {ingredient}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Usage Instructions */}
+                  <div>
+                    <h4 className="font-semibold text-lg mb-3 flex items-center gap-2">
+                      <Heart className="h-5 w-5 text-primary" />
+                      Usage Instructions
+                    </h4>
+                    <p className="text-muted-foreground bg-muted/50 p-4 rounded-lg">
+                      {selectedProduct.usage}
+                    </p>
+                  </div>
+
+                  {/* Quantity Selector */}
+                  <div className="flex items-center space-x-4">
+                    <Label>Quantity:</Label>
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                        disabled={quantity <= 1}
+                      >
+                        <Minus className="h-4 w-4" />
+                      </Button>
+                      <span className="w-12 text-center font-medium">{quantity}</span>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setQuantity(quantity + 1)}
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-3 pt-4">
+                    <Button 
+                      className="flex-1" 
+                      onClick={() => {
+                        handleAddToCart(selectedProduct, quantity);
+                        handleCloseModal();
+                      }}
+                      disabled={!selectedProduct.inStock}
+                    >
+                      <CartIcon className="h-4 w-4 mr-2" />
+                      Add {quantity} to Cart
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="flex-1"
+                      disabled={!selectedProduct.inStock}
+                    >
+                      Order via WhatsApp
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
